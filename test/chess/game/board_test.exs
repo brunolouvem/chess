@@ -77,7 +77,9 @@ defmodule Chess.Game.BoardTest do
       black_piece = build(:piece, color: "black", current_position: "a4", start_position: "a4")
 
       assert %Board{occupied_positions: ["a2"]} = board = Board.add_piece(board, piece)
-      assert %Board{occupied_positions: ["a4", "a2"]} = board = Board.add_piece(board, black_piece)
+
+      assert %Board{occupied_positions: ["a4", "a2"]} =
+               board = Board.add_piece(board, black_piece)
 
       updated_piece = Piece.update_position(piece, "a4")
 

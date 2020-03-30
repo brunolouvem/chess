@@ -3,28 +3,43 @@ defmodule Chess.Game.MovementTest do
 
   import Chess.Factory
 
-  alias Chess.Game.Pieces.Movement
+  alias Chess.Game.Board
+  alias Chess.Game.Movements.Movement
 
   describe "possible_moves/1" do
     test "succesfully get possible moves" do
-      piece = build(:piece)
-      assert ["a3", "a4"] = Movement.possible_moves(piece)
+      board = build(:board)
+      piece = build(:piece, start_position: "e2", current_position: "e2")
 
-      black_piece = build(:piece, color: "black", current_position: "a5")
-      assert ["a4"] = Movement.possible_moves(black_piece)
+      board = Board.add_piece(board, piece)
+
+      assert ["e3", "e4"] = Movement.possible_moves(board, piece)
+
+      black_piece = build(:piece, color: "black", current_position: "e5")
+
+      board = Board.add_piece(board, black_piece)
+
+      assert ["e4"] = Movement.possible_moves(board, black_piece)
     end
 
     test "not possible move more" do
+      board = build(:board)
       piece = build(:piece, current_position: "a8")
-      assert [] = Movement.possible_moves(piece)
+      assert [] = Movement.possible_moves(board, piece)
+
+      board = Board.add_piece(board, piece)
+
+      another_piece = build(:piece, current_position: "a7")
+      assert [] = Movement.possible_moves(board, another_piece)
     end
 
     test "position not valid" do
+      board = build(:board)
       piece = build(:piece, current_position: "x9")
       another_piece = build(:piece, start_position: "x9", current_position: "x9")
 
-      assert {:error, :invalid_position} = Movement.possible_moves(piece)
-      assert {:error, :invalid_position} = Movement.possible_moves(another_piece)
+      assert {:error, :invalid_position} = Movement.possible_moves(board, piece)
+      assert {:error, :invalid_position} = Movement.possible_moves(board, another_piece)
     end
   end
 

@@ -5,7 +5,7 @@ defmodule Chess.Game.Board do
   @lines 1..8
 
   alias Chess.Game.Pieces.Piece
-  alias Chess.Game.Pieces.Movement
+  alias Chess.Game.Movements.Movement
 
   def create() do
     %__MODULE__{
