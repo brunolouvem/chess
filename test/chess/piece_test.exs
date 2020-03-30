@@ -1,7 +1,7 @@
 defmodule Chess.Game.PieceTest do
-  use Chess.DataCase
+  use ExUnit.Case
 
-  alias Chess.Game.Pieces.Piece
+  alias Chess.Piece
 
   describe "create/3" do
     test "succesfully creation" do

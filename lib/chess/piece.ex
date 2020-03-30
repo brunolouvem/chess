@@ -1,4 +1,4 @@
-defmodule Chess.Game.Pieces.Piece do
+defmodule Chess.Piece do
   @piece_types [
     :bishop,
     :king,
@@ -14,6 +14,9 @@ defmodule Chess.Game.Pieces.Piece do
   ]
 
   defstruct current_position: nil, start_position: nil, color: nil, type: nil
+
+  def opponent_color("white"), do: "black"
+  def opponent_color("black"), do: "white"
 
   @spec position(piece :: %__MODULE__{}) :: String.t() | nil
   def position(%__MODULE__{} = piece) do
