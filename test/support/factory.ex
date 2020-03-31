@@ -1,10 +1,10 @@
 defmodule Chess.Factory do
   @moduledoc false
 
-  use ExMachina.Ecto, repo: Chess.Repo
+  use ExMachina
 
-  alias Chess.Game.Pieces.Piece
-  alias Chess.Game.Board
+  alias Chess.Piece
+  alias Chess.Board
 
   def piece_factory do
     Piece.create(:pawn, "white", "a2")

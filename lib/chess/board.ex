@@ -1,11 +1,11 @@
-defmodule Chess.Game.Board do
+defmodule Chess.Board do
   defstruct positions: [], occupied_positions: [], pieces: %{}, last_movement: nil
 
   @columns ["a", "b", "c", "d", "e", "f", "g", "h"]
   @lines 1..8
 
-  alias Chess.Game.Pieces.Piece
-  alias Chess.Game.Movements.Movement
+  alias Chess.Piece
+  alias Chess.Movements.Movement
 
   def create() do
     %__MODULE__{
@@ -79,6 +79,12 @@ defmodule Chess.Game.Board do
 
   def delete_piece(%__MODULE__{}, _), do: {:error, :not_valid_piece}
   def delete_piece(_, %Piece{}), do: {:error, :not_valid_board}
+
+  def positions_by_color(%__MODULE__{pieces: pieces}, color) do
+    pieces
+    |> Enum.filter(fn {_k, p} -> p.color == color  end)
+    |> Enum.map(fn  {k, _v} -> k end)
+  end
 
   defp position_exists?(positions, position) do
     Enum.member?(positions, position)

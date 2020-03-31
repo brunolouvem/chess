@@ -1,7 +1,7 @@
-defmodule Chess.Game.Movements.Pawn do
-  alias Chess.Game.Board
-  alias Chess.Game.Pieces.Piece
-  alias Chess.Game.Movements.Movement
+defmodule Chess.Movements.Pawn do
+  alias Chess.Board
+  alias Chess.Piece
+  alias Chess.Movements.Movement
 
   def possibles(%Piece{
         type: :pawn,

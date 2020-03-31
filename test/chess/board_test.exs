@@ -1,10 +1,10 @@
-defmodule Chess.Game.BoardTest do
-  use Chess.DataCase
+defmodule Chess.BoardTest do
+  use ExUnit.Case
 
   import Chess.Factory
 
-  alias Chess.Game.Board
-  alias Chess.Game.Pieces.Piece
+  alias Chess.Board
+  alias Chess.Piece
 
   describe "create/0" do
     test "succesfully creation board" do

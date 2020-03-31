@@ -1,10 +1,10 @@
 defmodule Chess.Game.MovementTest do
-  use Chess.DataCase
+  use ExUnit.Case
 
   import Chess.Factory
 
-  alias Chess.Game.Board
-  alias Chess.Game.Movements.Movement
+  alias Chess.Board
+  alias Chess.Movements.Movement
 
   describe "possible_moves/1" do
     test "succesfully get possible moves" do
