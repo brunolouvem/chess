@@ -10,9 +10,12 @@ defmodule Chess.Movements.King do
     opponent_positions = Board.positions_by_color(board, opponent_color)
     allies_positions = Board.positions_by_color(board, color) |> List.delete(current_position)
 
-    Movement.around_positions(piece)
-    |> Movement.filter_line(opponent_positions, true)
-    |> Movement.filter_line(allies_positions)
+    Movement.around_positions(piece, board)
+    |> Enum.map(fn move ->
+      move
+      |> Movement.filter_line(opponent_positions, true)
+      |> Movement.filter_line(allies_positions)
+    end)
     |> List.flatten()
   end
 end

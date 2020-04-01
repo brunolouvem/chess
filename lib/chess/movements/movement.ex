@@ -37,18 +37,18 @@ defmodule Chess.Movements.Movement do
      end
   end
 
-  def around_positions(%{current_position: current_position, color: color}) do
+  def around_positions(%{current_position: current_position, color: color}, %{positions: positions}) do
     case validate_position(current_position) do
       [_C, _L] = position ->
         [
-          up(position, 1, color),
-          diagonal_right_up(position, 1, color),
-          right(position, 1, color),
-          diagonal_right_down(position, 1, color),
-          down(position, 1, color),
-          diagonal_left_down(position, 1, color),
-          left(position, 1, color),
-          diagonal_left_up(position, 1, color)
+          up(position, 1, color, positions),
+          diagonal_right_up(position, 1, color, positions),
+          right(position, 1, color, positions),
+          diagonal_right_down(position, 1, color, positions),
+          down(position, 1, color, positions),
+          diagonal_left_down(position, 1, color, positions),
+          left(position, 1, color, positions),
+          diagonal_left_up(position, 1, color, positions)
         ]
       error -> error
      end
@@ -60,197 +60,111 @@ defmodule Chess.Movements.Movement do
   def possible_moves(board, %Piece{type: :rook} = piece), do: Rook.possibles(piece, board)
   def possible_moves(board, %Piece{type: :king} = piece), do: King.possibles(piece, board)
 
-  def up([column, line], steps, "white") when line < 8 and is_integer(steps) do
+  def up([column, line], steps, "white", all_positions) when line < 8 and is_integer(steps) do
     1..steps
-    |> Enum.map(fn step ->
-      line =
-        line
-                |> Kernel.+(step)
+    |> Enum.reduce_while([], fn step, acc ->
+      line = line |> Kernel.+(step)
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def up([column, line], steps, "black") when line > 1 and is_integer(steps) do
+  def up([column, line], steps, "black", all_positions) when line > 1 and is_integer(steps) do
     1..steps
-    |> Enum.map(fn step ->
-      line =
-        line
-                |> Kernel.-(step)
-
-      "#{column}#{line}"
-    end)
-  end
-
-  def up(_, _, _), do: []
-
-  def down([column, line], steps, "white") when line > 1 and is_integer(steps) do
-    1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
       line =
         line
                 |> Kernel.-(step)
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def down([column, line], steps, "black") when line < 8 and is_integer(steps) do
+  def up(_, _, _, _), do: []
+
+  def down([column, line], steps, "white", all_positions) when line > 1 and is_integer(steps) do
     1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
+      line =
+        line
+                |> Kernel.-(step)
+
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
+    end)
+  end
+
+  def down([column, line], steps, "black", all_positions) when line < 8 and is_integer(steps) do
+    1..steps
+    |> Enum.reduce_while([], fn step, acc ->
       line =
         line
                 |> Kernel.+(step)
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def down(_, _, _), do: []
+  def down(_, _, _, _), do: []
 
-  def left([column, line], steps, "white") when column != "a" do
+  def left([column, line], steps, "white", all_positions) when column != "a" do
     1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
       column =
         column
         |> column_to_index()
         |> Kernel.-(step)
         |> index_to_column()
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def left([column, line], steps, "black") when column != "h" do
+  def left([column, line], steps, "black", all_positions) when column != "h" do
     1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
       column =
         column
         |> column_to_index()
         |> Kernel.+(step)
         |> index_to_column()
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def left(_, _, _), do: []
+  def left(_, _, _, _), do: []
 
-  def right([column, line], steps, "white") when column != "h" do
+  def right([column, line], steps, "white", all_positions) when column != "h" do
     1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
       column =
         column
         |> column_to_index()
         |> Kernel.+(step)
         |> index_to_column()
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def right([column, line], steps, "black") when column != "a" do
+  def right([column, line], steps, "black", all_positions) when column != "a" do
     1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
       column =
         column
         |> column_to_index()
         |> Kernel.-(step)
         |> index_to_column()
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def right(_, _, _), do: []
+  def right(_, _, _, _), do: []
 
-  def diagonal_right_up([column, line], steps, "white") when column != "h" and line < 8 and is_integer(steps) do
+  def diagonal_right_up([column, line], steps, "white", all_positions) when column != "h" and line < 8 and is_integer(steps) do
     1..steps
-    |> Enum.map(fn step ->
-
-      column =
-        column
-        |> column_to_index()
-        |> Kernel.+(step)
-        |> index_to_column()
-
-      line = line |> Kernel.+(step)
-
-      "#{column}#{line}"
-    end)
-  end
-
-  def diagonal_right_up([column, line], steps, "black") when column != "a" and line > 1 and is_integer(steps) do
-    1..steps
-    |> Enum.map(fn step ->
-
-      column =
-        column
-        |> column_to_index()
-        |> Kernel.-(step)
-        |> index_to_column()
-
-      line = line |> Kernel.-(step)
-
-      "#{column}#{line}"
-    end)
-  end
-
-  def diagonal_right_up(_, _, _), do: []
-
-  def diagonal_left_up([column, line], steps, "white") when column != "a" and line < 8 and is_integer(steps) do
-    1..steps
-    |> Enum.map(fn step ->
-
-      column =
-        column
-        |> column_to_index()
-        |> Kernel.-(step)
-        |> index_to_column()
-
-      line = line |> Kernel.+(step)
-
-      "#{column}#{line}"
-    end)
-  end
-
-  def diagonal_left_up([column, line], steps, "black") when column != "h" and line > 1 and is_integer(steps) do
-    1..steps
-    |> Enum.map(fn step ->
-
-      column =
-        column
-        |> column_to_index()
-        |> Kernel.+(step)
-        |> index_to_column()
-
-      line = line |> Kernel.-(step)
-
-      "#{column}#{line}"
-    end)
-  end
-
-  def diagonal_left_up(_, _, _), do: []
-
-  def diagonal_left_down([column, line], steps, "white") when column != "a" and line > 1 and is_integer(steps) do
-    1..steps
-    |> Enum.map(fn step ->
-
-      column =
-        column
-        |> column_to_index()
-        |> Kernel.-(step)
-        |> index_to_column()
-
-      line = line |> Kernel.-(step)
-
-      "#{column}#{line}"
-    end)
-  end
-
-  def diagonal_left_down([column, line], steps, "black") when column != "h" and line < 8 and is_integer(steps) do
-    1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
 
       column =
         column
@@ -260,31 +174,31 @@ defmodule Chess.Movements.Movement do
 
       line = line |> Kernel.+(step)
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def diagonal_left_down(_, _, _), do: []
-
-  def diagonal_right_down([column, line], steps, "white") when column != "h" and line > 1 and is_integer(steps) do
+  def diagonal_right_up([column, line], steps, "black", all_positions) when column != "a" and line > 1 and is_integer(steps) do
     1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
 
       column =
         column
         |> column_to_index()
-        |> Kernel.+(step)
+        |> Kernel.-(step)
         |> index_to_column()
 
       line = line |> Kernel.-(step)
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def diagonal_right_down([column, line], steps, "black") when column != "a" and line < 8 and is_integer(steps) do
+  def diagonal_right_up(_, _, _, _), do: []
+
+  def diagonal_left_up([column, line], steps, "white", all_positions) when column != "a" and line < 8 and is_integer(steps) do
     1..steps
-    |> Enum.map(fn step ->
+    |> Enum.reduce_while([], fn step, acc ->
 
       column =
         column
@@ -294,11 +208,95 @@ defmodule Chess.Movements.Movement do
 
       line = line |> Kernel.+(step)
 
-      "#{column}#{line}"
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
     end)
   end
 
-  def diagonal_right_down(_, _, _), do: []
+  def diagonal_left_up([column, line], steps, "black", all_positions) when column != "h" and line > 1 and is_integer(steps) do
+    1..steps
+    |> Enum.reduce_while([], fn step, acc ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.+(step)
+        |> index_to_column()
+
+      line = line |> Kernel.-(step)
+
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
+    end)
+  end
+
+  def diagonal_left_up(_, _, _, _), do: []
+
+  def diagonal_left_down([column, line], steps, "white", all_positions) when column != "a" and line > 1 and is_integer(steps) do
+    1..steps
+    |> Enum.reduce_while([], fn step, acc ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.-(step)
+        |> index_to_column()
+
+      line = line |> Kernel.-(step)
+
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
+    end)
+  end
+
+  def diagonal_left_down([column, line], steps, "black", all_positions) when column != "h" and line < 8 and is_integer(steps) do
+    1..steps
+    |> Enum.reduce_while([], fn step, acc ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.+(step)
+        |> index_to_column()
+
+      line = line |> Kernel.+(step)
+
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
+    end)
+  end
+
+  def diagonal_left_down(_, _, _, _), do: []
+
+  def diagonal_right_down([column, line], steps, "white", all_positions) when column != "h" and line > 1 and is_integer(steps) do
+    1..steps
+    |> Enum.reduce_while([], fn step, acc ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.+(step)
+        |> index_to_column()
+
+      line = line |> Kernel.-(step)
+
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
+    end)
+  end
+
+  def diagonal_right_down([column, line], steps, "black", all_positions) when column != "a" and line < 8 and is_integer(steps) do
+    1..steps
+    |> Enum.reduce_while([], fn step, acc ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.-(step)
+        |> index_to_column()
+
+      line = line |> Kernel.+(step)
+
+      if "#{column}#{line}" in all_positions, do: {:cont, ["#{column}#{line}" | acc]}, else: {:halt, acc}
+    end)
+  end
+
+  def diagonal_right_down(_, _, _, _), do: []
 
   def validate_position(raw_position) do
     @position_regex
