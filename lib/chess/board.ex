@@ -1,5 +1,7 @@
 defmodule Chess.Board do
-  defstruct positions: [], occupied_positions: [], pieces: %{}, last_movement: nil
+  alias Chess.Matrix
+
+  defstruct positions: [], occupied_positions: [], pieces: %{}, last_movement: nil, matrix: %Matrix{}
 
   @columns ["a", "b", "c", "d", "e", "f", "g", "h"]
   @lines 1..8
@@ -9,7 +11,8 @@ defmodule Chess.Board do
 
   def create() do
     %__MODULE__{
-      positions: generate_positions_matrix()
+      positions: generate_positions_matrix(),
+      matrix: Matrix.new(Enum.map(@lines, &(&1)), @columns)
     }
   end
 

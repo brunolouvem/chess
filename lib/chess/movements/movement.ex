@@ -1,8 +1,11 @@
 defmodule Chess.Movements.Movement do
+  alias Chess.Board
+  alias Chess.Movements.King
   alias Chess.Movements.Pawn
   alias Chess.Movements.Rook
-
   alias Chess.Piece
+
+  @callback possibles(%Board{}, %Piece{}) :: List.t()
 
   @position_regex ~r/([a-h])([1-8])/
 
@@ -18,39 +21,44 @@ defmodule Chess.Movements.Movement do
   def movement_coord(:knight, position), do: "N#{position}"
   def movement_coord(_, _), do: {:error, :not_valid_piece}
 
+  def line_from_position(%{matrix: matrix}, position) do
+     case validate_position(position) do
+      [_column, line] ->
+        matrix.lines[String.to_atom("L#{line}")]
+      error -> error
+     end
+  end
+
+  def column_from_position(%{matrix: matrix}, position) do
+     case validate_position(position) do
+      [column, _line] ->
+        matrix.columns[String.to_atom("C#{String.upcase(column)}")]
+      error -> error
+     end
+  end
+
+  def around_positions(%{current_position: current_position, color: color}) do
+    case validate_position(current_position) do
+      [_C, _L] = position ->
+        [
+          up(position, 1, color),
+          diagonal_right_up(position, 1, color),
+          right(position, 1, color),
+          diagonal_right_down(position, 1, color),
+          down(position, 1, color),
+          diagonal_left_down(position, 1, color),
+          left(position, 1, color),
+          diagonal_left_up(position, 1, color)
+        ]
+      error -> error
+     end
+  end
+
   def maximum_line_size(), do: @maximum_line_size
-
-  def calculate_steps(:horizontal, current_column, color) do
-    index = column_to_index(current_column) |> Kernel.+(1)
-    initial_index = @columns |> List.first() |> column_to_index() |> Kernel.+(1)
-    final_index = @columns |> List.last() |> column_to_index() |> Kernel.+(1)
-
-    steps_to_ini = index - initial_index
-    steps_to_ini = if steps_to_ini <= 0, do: 0, else: steps_to_ini
-
-    case color do
-      "white" ->
-        [steps_to_ini, final_index - index]
-      _ ->
-        [final_index - index, steps_to_ini]
-    end
-  end
-
-  def calculate_steps(:vertical, current_line, color) do
-    # current_line = String.to_integer(current_line)
-    steps_to_ini = current_line - 1
-    steps_to_ini = if steps_to_ini <= 0, do: 0, else: steps_to_ini
-
-    case color do
-      "white" ->
-        [steps_to_ini, @maximum_line_size - current_line]
-      _ ->
-        [@maximum_line_size - current_line, steps_to_ini]
-    end
-  end
 
   def possible_moves(board, %Piece{type: :pawn} = piece), do: Pawn.possibles(piece, board)
   def possible_moves(board, %Piece{type: :rook} = piece), do: Rook.possibles(piece, board)
+  def possible_moves(board, %Piece{type: :king} = piece), do: King.possibles(piece, board)
 
   def up([column, line], steps, "white") when line < 8 and is_integer(steps) do
     1..steps
@@ -156,7 +164,7 @@ defmodule Chess.Movements.Movement do
 
   def right(_, _, _), do: []
 
-  def diagonal_right_up([column, line], steps, "white") when column != "h" and is_integer(steps) do
+  def diagonal_right_up([column, line], steps, "white") when column != "h" and line < 8 and is_integer(steps) do
     1..steps
     |> Enum.map(fn step ->
 
@@ -172,7 +180,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def diagonal_right_up([column, line], steps, "black") when column != "a" and is_integer(steps) do
+  def diagonal_right_up([column, line], steps, "black") when column != "a" and line > 1 and is_integer(steps) do
     1..steps
     |> Enum.map(fn step ->
 
@@ -190,7 +198,7 @@ defmodule Chess.Movements.Movement do
 
   def diagonal_right_up(_, _, _), do: []
 
-  def diagonal_left_up([column, line], steps, "white") when column != "a" and is_integer(steps) do
+  def diagonal_left_up([column, line], steps, "white") when column != "a" and line < 8 and is_integer(steps) do
     1..steps
     |> Enum.map(fn step ->
 
@@ -206,7 +214,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def diagonal_left_up([column, line], steps, "black") when column != "h" and is_integer(steps) do
+  def diagonal_left_up([column, line], steps, "black") when column != "h" and line > 1 and is_integer(steps) do
     1..steps
     |> Enum.map(fn step ->
 
@@ -223,6 +231,74 @@ defmodule Chess.Movements.Movement do
   end
 
   def diagonal_left_up(_, _, _), do: []
+
+  def diagonal_left_down([column, line], steps, "white") when column != "a" and line > 1 and is_integer(steps) do
+    1..steps
+    |> Enum.map(fn step ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.-(step)
+        |> index_to_column()
+
+      line = line |> Kernel.-(step)
+
+      "#{column}#{line}"
+    end)
+  end
+
+  def diagonal_left_down([column, line], steps, "black") when column != "h" and line < 8 and is_integer(steps) do
+    1..steps
+    |> Enum.map(fn step ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.+(step)
+        |> index_to_column()
+
+      line = line |> Kernel.+(step)
+
+      "#{column}#{line}"
+    end)
+  end
+
+  def diagonal_left_down(_, _, _), do: []
+
+  def diagonal_right_down([column, line], steps, "white") when column != "h" and line > 1 and is_integer(steps) do
+    1..steps
+    |> Enum.map(fn step ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.+(step)
+        |> index_to_column()
+
+      line = line |> Kernel.-(step)
+
+      "#{column}#{line}"
+    end)
+  end
+
+  def diagonal_right_down([column, line], steps, "black") when column != "a" and line < 8 and is_integer(steps) do
+    1..steps
+    |> Enum.map(fn step ->
+
+      column =
+        column
+        |> column_to_index()
+        |> Kernel.-(step)
+        |> index_to_column()
+
+      line = line |> Kernel.+(step)
+
+      "#{column}#{line}"
+    end)
+  end
+
+  def diagonal_right_down(_, _, _), do: []
 
   def validate_position(raw_position) do
     @position_regex

@@ -3,6 +3,8 @@ defmodule Chess.Movements.Pawn do
   alias Chess.Piece
   alias Chess.Movements.Movement
 
+  @behaviour Movement
+
   def possibles(%Piece{
         type: :pawn,
         current_position: current_position,
