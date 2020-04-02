@@ -1,7 +1,11 @@
 defmodule Chess.Board do
   alias Chess.Matrix
 
-  defstruct positions: [], occupied_positions: [], pieces: %{}, last_movement: nil, matrix: %Matrix{}
+  defstruct positions: [],
+            occupied_positions: [],
+            pieces: %{},
+            last_movement: nil,
+            matrix: %Matrix{}
 
   @columns ["a", "b", "c", "d", "e", "f", "g", "h"]
   @lines 1..8
@@ -12,7 +16,7 @@ defmodule Chess.Board do
   def create() do
     %__MODULE__{
       positions: generate_positions_matrix(),
-      matrix: Matrix.new(Enum.map(@lines, &(&1)), @columns)
+      matrix: Matrix.new(Enum.map(@lines, & &1), @columns)
     }
   end
 
@@ -85,8 +89,8 @@ defmodule Chess.Board do
 
   def positions_by_color(%__MODULE__{pieces: pieces}, color) do
     pieces
-    |> Enum.filter(fn {_k, p} -> p.color == color  end)
-    |> Enum.map(fn  {k, _v} -> k end)
+    |> Enum.filter(fn {_k, p} -> p.color == color end)
+    |> Enum.map(fn {k, _v} -> k end)
   end
 
   defp position_exists?(positions, position) do

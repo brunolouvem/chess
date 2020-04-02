@@ -5,13 +5,18 @@ defmodule Chess.Movements.Rook do
 
   @behaviour Movement
 
-  def possibles(%Piece{
-        type: :rook,
-        current_position: current_position,
-        color: color
-      }, board) do
+  def possibles(
+        %Piece{
+          type: :rook,
+          current_position: current_position,
+          color: color
+        } = piece,
+        board
+      ) do
     case Movement.validate_position(current_position) do
-      {:error, _} = error -> error
+      {:error, _} = error ->
+        error
+
       _ ->
         opponent_color = Piece.opponent_color(color)
         opponent_positions = Board.positions_by_color(board, opponent_color)
@@ -19,14 +24,14 @@ defmodule Chess.Movements.Rook do
 
         line =
           board
-          |> Movement.line_from_position(current_position)
+          |> Movement.line_from_position(piece)
           |> List.delete(current_position)
           |> Movement.filter_line(opponent_positions, true)
           |> Movement.filter_line(allies_positions)
 
         column =
           board
-          |> Movement.column_from_position(current_position)
+          |> Movement.column_from_position(piece)
           |> List.delete(current_position)
           |> Movement.filter_line(opponent_positions, true)
           |> Movement.filter_line(allies_positions)

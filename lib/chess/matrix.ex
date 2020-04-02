@@ -19,7 +19,7 @@ defmodule Chess.Matrix do
     lines
     |> Enum.reduce(matrix, fn element, matrix ->
       key = "#{@line_prefix}#{element}" |> String.to_atom()
-      value = Enum.map(columns, &("#{&1}#{element}"))
+      value = Enum.map(columns, &"#{&1}#{element}")
 
       %{matrix | lines: Keyword.put_new(matrix.lines, key, value)}
     end)
@@ -29,7 +29,7 @@ defmodule Chess.Matrix do
     columns
     |> Enum.reduce(matrix, fn element, matrix ->
       key = "#{@column_prefix}#{String.upcase(element)}" |> String.to_atom()
-      value = Enum.map(lines, &("#{element}#{&1}"))
+      value = Enum.map(lines, &"#{element}#{&1}")
 
       %{matrix | columns: Keyword.put_new(matrix.columns, key, value)}
     end)

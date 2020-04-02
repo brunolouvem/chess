@@ -5,15 +5,20 @@ defmodule Chess.Movements.Pawn do
 
   @behaviour Movement
 
-  def possibles(%Piece{
-        type: :pawn,
-        current_position: current_position,
-        start_position: start_position,
-        color: color
-      }, %Board{occupied_positions: occupied_positions, positions: positions})
+  def possibles(
+        %Piece{
+          type: :pawn,
+          current_position: current_position,
+          start_position: start_position,
+          color: color
+        },
+        %Board{occupied_positions: occupied_positions, positions: positions}
+      )
       when current_position == start_position do
     case Movement.validate_position(current_position) do
-      {:error, _} = error -> error
+      {:error, _} = error ->
+        error
+
       position ->
         walk_positions =
           Movement.up(position, 2, color, positions)
@@ -25,13 +30,18 @@ defmodule Chess.Movements.Pawn do
     end
   end
 
-  def possibles(%Piece{
-        type: :pawn,
-        current_position: current_position,
-        color: color
-      }, %Board{occupied_positions: occupied_positions, positions: positions}) do
+  def possibles(
+        %Piece{
+          type: :pawn,
+          current_position: current_position,
+          color: color
+        },
+        %Board{occupied_positions: occupied_positions, positions: positions}
+      ) do
     case Movement.validate_position(current_position) do
-      {:error, _} = error -> error
+      {:error, _} = error ->
+        error
+
       position ->
         walk_positions =
           Movement.up(position, 1, color, positions)
