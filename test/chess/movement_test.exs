@@ -6,6 +6,20 @@ defmodule Chess.Game.MovementTest do
   alias Chess.Board
   alias Chess.Movements.Movement
 
+  describe "create/1" do
+    test "when coords is valid" do
+      coords = ["e3", "e4", "e5"]
+      assert %Movement{
+          coords: ^coords,
+          start: "e3",
+          end: "e5"
+        } = Movement.create(coords)
+    end
+    test "when coords is not valid" do
+      assert {:error, :not_valid_coords} = Movement.create("e4")
+    end
+  end
+
   describe "possible_moves/1" do
     test "succesfully get possible moves" do
       board = build(:board)
@@ -13,7 +27,7 @@ defmodule Chess.Game.MovementTest do
 
       board = Board.add_piece(board, piece)
 
-      assert ["e3", "e4"] = Movement.possible_moves(board, piece)
+      assert ["e4", "e3"] = Movement.possible_moves(board, piece)
 
       black_piece = build(:piece, color: "black", current_position: "e5")
 
