@@ -2,6 +2,25 @@
 
 **TODO: Add description**
 
+## Roadmap
+
+- [x] Board
+- [ ] Movements
+  - [x] Pawn
+  - [x] Rook
+  - [x] King
+  - [x] Queen
+  - [x] Bishop
+  - [ ] Knight
+- [ ] Create game
+- [ ] Pion's en passant
+- [ ] Castling
+- [ ] Checkmate
+- [ ] Checking possible checkmate for next turn
+- [ ] Pawn's promotion at last line
+- [ ] PGN coordinates on Board Struct
+
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
