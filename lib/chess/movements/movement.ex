@@ -1,5 +1,6 @@
 defmodule Chess.Movements.Movement do
   alias Chess.Board
+  alias Chess.Matrix
   alias Chess.Movements.{Bishop, King, Pawn, Queen, Rook}
   alias Chess.Piece
 
@@ -12,7 +13,6 @@ defmodule Chess.Movements.Movement do
   @columns for n <- ?a..?h, do: <<n::utf8>>
 
   @maximum_line_size 8
-  @maximum_column_size 8
 
   def create(coords) when is_list(coords) do
     %__MODULE__{
@@ -40,91 +40,25 @@ defmodule Chess.Movements.Movement do
   def movement_coord(:knight, position), do: "N#{position}"
   def movement_coord(_, _), do: {:error, :not_valid_piece}
 
-  def diagonal(%{current_position: current_position}, %{positions: positions}) do
-    case validate_position(current_position) do
+  def diagonal_from_position(%{matrix: matrix}, %{current_position: position}) do
+    case validate_position(position) do
       [column, line] ->
-        # setting constants of algorithm
-        # using color constant
-        color = "white"
+
         column_index = column_to_index(column) + 1
-        first_column = @columns |> List.first()
-        first_line = 1
-        main_diagonal_steps = 7
-        main_diagonal_rf = 0
 
-        cond do
-          (rank_minus_file = line - column_index) < main_diagonal_rf ->
-            start_col = abs(rank_minus_file) |> index_to_column()
-            steps = @maximum_column_size + rank_minus_file
-
-            ["#{start_col}#{first_line}"] ++
-              (diagonal_right_up([start_col, first_line], steps, color, positions)
-               |> Enum.reverse())
-
-          (rank_minus_file = line - column_index) > main_diagonal_rf ->
-            start_line = 1 + abs(rank_minus_file)
-            steps = @maximum_line_size - rank_minus_file
-
-            ["#{first_column}#{start_line}"] ++
-              (diagonal_right_up([first_column, start_line], steps, color, positions)
-               |> Enum.reverse())
-
-          line - column_index == main_diagonal_rf ->
-            ["#{first_column}#{first_line}"] ++
-              (diagonal_right_up(
-                 [first_column, first_line],
-                 main_diagonal_steps,
-                 color,
-                 positions
-               )
-               |> Enum.reverse())
-        end
-
+        matrix.diagonals[Matrix.key(:diagonal, (line - column_index))]
       error ->
         error
     end
   end
 
-  def anti_diagonal(%{current_position: current_position}, %{positions: positions}) do
-    case validate_position(current_position) do
+  def anti_diagonal_from_position(%{matrix: matrix}, %{current_position: position}) do
+    case validate_position(position) do
       [column, line] ->
-        # setting constants of algorithm
-        # using color constant
-        color = "white"
+
         column_index = column_to_index(column) + 1
-        first_column = @columns |> List.first()
-        last_line = 8
-        main_diagonal_steps = 7
-        main_diagonal_rf = 9
 
-        cond do
-          (rank_minus_file = line + column_index) > main_diagonal_rf ->
-            start_col = (abs(rank_minus_file) - @maximum_column_size - 1) |> index_to_column()
-            steps = abs(1 - rank_minus_file)
-
-            ["#{start_col}#{last_line}"] ++
-              (diagonal_right_down([start_col, last_line], steps, color, positions)
-               |> Enum.reverse())
-
-          (rank_minus_file = line + column_index) < main_diagonal_rf ->
-            start_line = rank_minus_file - 1
-            steps = rank_minus_file + 1
-
-            ["#{first_column}#{start_line}"] ++
-              (diagonal_right_down([first_column, start_line], steps, color, positions)
-               |> Enum.reverse())
-
-          line + column_index == main_diagonal_rf ->
-            ["#{first_column}#{last_line}"] ++
-              (diagonal_right_down(
-                 [first_column, last_line],
-                 main_diagonal_steps,
-                 color,
-                 positions
-               )
-               |> Enum.reverse())
-        end
-
+        matrix.anti_diagonals[Matrix.key(:anti_diagonal, (line + column_index))]
       error ->
         error
     end
@@ -445,11 +379,15 @@ defmodule Chess.Movements.Movement do
     @position_regex
     |> Regex.match?(raw_position)
     |> if do
-      [c, l] = Regex.run(@position_regex, raw_position) |> List.delete(raw_position)
-      [c, l |> String.to_integer()]
+      extract_position(raw_position)
     else
       {:error, :invalid_position}
     end
+  end
+
+  def extract_position(raw_position) do
+    [c, l] = Regex.run(@position_regex, raw_position) |> List.delete(raw_position)
+    [c, l |> String.to_integer()]
   end
 
   def filter_line(line, break_points, include_break \\ false) do
