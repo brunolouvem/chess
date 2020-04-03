@@ -10,12 +10,12 @@ defmodule Chess.Movements.Bishop do
     opponent_positions = Board.positions_by_color(board, opponent_color)
     allies_positions = Board.positions_by_color(board, color) |> List.delete(current_position)
 
-    diagonal = Movement.diagonal(piece, board)
+    diagonal = Movement.diagonal_from_position(board, piece)
 
     {diagonal_before, diagonal_after} =
       Movement.centralize_position_in_sequence(diagonal, current_position)
 
-    anti_diagonal = Movement.anti_diagonal(piece, board)
+    anti_diagonal = Movement.anti_diagonal_from_position(board, piece)
 
     {anti_diagonal_before, anti_diagonal_after} =
       Movement.centralize_position_in_sequence(anti_diagonal, current_position)
