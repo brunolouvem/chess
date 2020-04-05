@@ -14,6 +14,7 @@ defmodule Chess.Movements.Movement do
 
   @maximum_line_size 8
 
+  def create([]), do: {:error, :not_valid_coords}
   def create(coords) when is_list(coords) do
     %__MODULE__{
       coords: coords,
@@ -21,16 +22,18 @@ defmodule Chess.Movements.Movement do
       end: List.last(coords)
     }
   end
-
   def create(_), do: {:error, :not_valid_coords}
 
   def maximum_line_size(), do: @maximum_line_size
 
-  def possible_moves(board, %Piece{type: :bishop} = piece), do: Bishop.possibles(piece, board)
-  def possible_moves(board, %Piece{type: :pawn} = piece), do: Pawn.possibles(piece, board)
-  def possible_moves(board, %Piece{type: :rook} = piece), do: Rook.possibles(piece, board)
-  def possible_moves(board, %Piece{type: :king} = piece), do: King.possibles(piece, board)
-  def possible_moves(board, %Piece{type: :queen} = piece), do: Queen.possibles(piece, board)
+  def get_movements(board, %Piece{type: type} = piece),
+    do: movement_module(type).possibles(piece, board)
+
+  def movement_module(:bishop), do: Bishop
+  def movement_module(:pawn), do: Pawn
+  def movement_module(:rook), do: Rook
+  def movement_module(:king), do: King
+  def movement_module(:queen), do: Queen
 
   def movement_coord(:pawn, position), do: position
   def movement_coord(:king, position), do: "K#{position}"
@@ -67,7 +70,7 @@ defmodule Chess.Movements.Movement do
   def line_from_position(%{matrix: matrix}, %{current_position: position}) do
     case validate_position(position) do
       [_column, line] ->
-        matrix.lines[String.to_atom("L#{line}")]
+        matrix.lines[Matrix.key(:line, line)]
 
       error ->
         error
@@ -77,16 +80,14 @@ defmodule Chess.Movements.Movement do
   def column_from_position(%{matrix: matrix}, %{current_position: position}) do
     case validate_position(position) do
       [column, _line] ->
-        matrix.columns[String.to_atom("C#{String.upcase(column)}")]
+        matrix.columns[Matrix.key(:column, column)]
 
       error ->
         error
     end
   end
 
-  def around_positions(%{current_position: current_position, color: color}, %{
-        positions: positions
-      }) do
+  def around_positions(%{positions: positions}, %{current_position: current_position, color: color}) do
     case validate_position(current_position) do
       [_C, _L] = position ->
         [

@@ -13,30 +13,41 @@ defmodule Chess.Movements.Rook do
         } = piece,
         board
       ) do
-    case Movement.validate_position(current_position) do
-      {:error, _} = error ->
-        error
+      opponent_color = Piece.opponent_color(color)
+      opponent_positions = Board.positions_by_color(board, opponent_color)
+      allies_positions = Board.positions_by_color(board, color) |> List.delete(current_position)
 
-      _ ->
-        opponent_color = Piece.opponent_color(color)
-        opponent_positions = Board.positions_by_color(board, opponent_color)
-        allies_positions = Board.positions_by_color(board, color) |> List.delete(current_position)
+      line = Movement.line_from_position(board, piece)
 
-        line =
-          board
-          |> Movement.line_from_position(piece)
-          |> List.delete(current_position)
-          |> Movement.filter_line(opponent_positions, true)
-          |> Movement.filter_line(allies_positions)
+      {line_before, line_after} = Movement.centralize_position_in_sequence(line, current_position)
 
-        column =
-          board
-          |> Movement.column_from_position(piece)
-          |> List.delete(current_position)
-          |> Movement.filter_line(opponent_positions, true)
-          |> Movement.filter_line(allies_positions)
+      column = Movement.column_from_position(board, piece)
 
-        line ++ column
-    end
+      {column_before, column_after} =
+        Movement.centralize_position_in_sequence(column, current_position)
+
+      [
+        column_before,
+        column_after,
+        line_before,
+        line_after
+      ]
+      |> Enum.reduce([], fn move, acc ->
+        move
+        |> Movement.filter_line(opponent_positions, true)
+        |> Movement.filter_line(allies_positions)
+        |> case do
+          [] -> []
+          [^current_position] -> []
+          positions -> List.insert_at(positions, 0, current_position)
+        end
+        |> Movement.create()
+        |> case do
+          %Movement{} = movement ->
+            [movement | acc]
+          _ -> acc
+        end
+      end)
+      |> List.flatten()
   end
 end
