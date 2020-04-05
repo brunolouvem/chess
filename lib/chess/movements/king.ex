@@ -23,7 +23,9 @@ defmodule Chess.Movements.King do
       |> case do
         %Movement{} = movement ->
           [movement | acc]
-        _ -> acc
+
+        _ ->
+          acc
       end
     end)
     |> List.flatten()

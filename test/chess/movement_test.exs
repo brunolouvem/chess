@@ -9,12 +9,14 @@ defmodule Chess.Game.MovementTest do
   describe "create/1" do
     test "when coords is valid" do
       coords = ["e3", "e4", "e5"]
+
       assert %Movement{
-          coords: ^coords,
-          start: "e3",
-          end: "e5"
-        } = Movement.create(coords)
+               coords: ^coords,
+               start: "e3",
+               end: "e5"
+             } = Movement.create(coords)
     end
+
     test "when coords is not valid" do
       assert {:error, :not_valid_coords} = Movement.create("e4")
     end
@@ -24,25 +26,27 @@ defmodule Chess.Game.MovementTest do
     test "succesfully king move without another pieces" do
       board = build(:board)
       king = build(:piece, type: :king, start_position: "e1", current_position: "e1")
-      black_king = build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
+
+      black_king =
+        build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
 
       board = Board.add_piece(board, king)
 
       assert [
-        %Movement{coords: ["e1", "d2"], end: "d2", start: "e1"},
-        %Movement{coords: ["e1", "d1"], end: "d1", start: "e1"},
-        %Movement{coords: ["e1", "f1"], end: "f1", start: "e1"},
-        %Movement{coords: ["e1", "f2"], end: "f2", start: "e1"},
-        %Movement{coords: ["e1", "e2"], end: "e2", start: "e1"}
-      ] = Movement.get_movements(board, king)
+               %Movement{coords: ["e1", "d2"], end: "d2", start: "e1"},
+               %Movement{coords: ["e1", "d1"], end: "d1", start: "e1"},
+               %Movement{coords: ["e1", "f1"], end: "f1", start: "e1"},
+               %Movement{coords: ["e1", "f2"], end: "f2", start: "e1"},
+               %Movement{coords: ["e1", "e2"], end: "e2", start: "e1"}
+             ] = Movement.get_movements(board, king)
 
       assert [
-        %Chess.Movements.Movement{coords: ["e8", "f7"], end: "f7", start: "e8"},
-        %Chess.Movements.Movement{coords: ["e8", "f8"], end: "f8", start: "e8"},
-        %Chess.Movements.Movement{coords: ["e8", "d8"], end: "d8", start: "e8"},
-        %Chess.Movements.Movement{coords: ["e8", "d7"], end: "d7", start: "e8"},
-        %Chess.Movements.Movement{coords: ["e8", "e7"], end: "e7", start: "e8"}
-      ] = Movement.get_movements(board, black_king)
+               %Chess.Movements.Movement{coords: ["e8", "f7"], end: "f7", start: "e8"},
+               %Chess.Movements.Movement{coords: ["e8", "f8"], end: "f8", start: "e8"},
+               %Chess.Movements.Movement{coords: ["e8", "d8"], end: "d8", start: "e8"},
+               %Chess.Movements.Movement{coords: ["e8", "d7"], end: "d7", start: "e8"},
+               %Chess.Movements.Movement{coords: ["e8", "e7"], end: "e7", start: "e8"}
+             ] = Movement.get_movements(board, black_king)
     end
 
     test "succesfully get possible moves with another pieces" do
@@ -58,11 +62,11 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(opponent_pawn)
 
       assert [
-        %Movement{coords: ["e1", "d2"], end: "d2", start: "e1"},
-        %Movement{coords: ["e1", "f1"], end: "f1", start: "e1"},
-        %Movement{coords: ["e1", "f2"], end: "f2", start: "e1"},
-        %Movement{coords: ["e1", "e2"], end: "e2", start: "e1"}
-      ] = Movement.get_movements(board, king)
+               %Movement{coords: ["e1", "d2"], end: "d2", start: "e1"},
+               %Movement{coords: ["e1", "f1"], end: "f1", start: "e1"},
+               %Movement{coords: ["e1", "f2"], end: "f2", start: "e1"},
+               %Movement{coords: ["e1", "e2"], end: "e2", start: "e1"}
+             ] = Movement.get_movements(board, king)
     end
   end
 
@@ -74,32 +78,32 @@ defmodule Chess.Game.MovementTest do
       board = Board.add_piece(board, queen)
 
       assert [
-        %Movement{
-          coords: ["d1", "c2", "b3", "a4"],
-          end: "a4",
-          start: "d1"
-        },
-        %Movement{
-          coords: ["d1", "e2", "f3", "g4", "h5"],
-          end: "h5",
-          start: "d1"
-        },
-        %Movement{
-          coords: ["d1", "e1", "f1", "g1", "h1"],
-          end: "h1",
-          start: "d1"
-        },
-        %Movement{
-          coords: ["d1", "c1", "b1", "a1"],
-          end: "a1",
-          start: "d1"
-        },
-        %Movement{
-          coords: ["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8"],
-          end: "d8",
-          start: "d1"
-        }
-      ] = Movement.get_movements(board, queen)
+               %Movement{
+                 coords: ["d1", "c2", "b3", "a4"],
+                 end: "a4",
+                 start: "d1"
+               },
+               %Movement{
+                 coords: ["d1", "e2", "f3", "g4", "h5"],
+                 end: "h5",
+                 start: "d1"
+               },
+               %Movement{
+                 coords: ["d1", "e1", "f1", "g1", "h1"],
+                 end: "h1",
+                 start: "d1"
+               },
+               %Movement{
+                 coords: ["d1", "c1", "b1", "a1"],
+                 end: "a1",
+                 start: "d1"
+               },
+               %Movement{
+                 coords: ["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8"],
+                 end: "d8",
+                 start: "d1"
+               }
+             ] = Movement.get_movements(board, queen)
     end
 
     test "succesfully get possible moves with another pieces" do
@@ -115,27 +119,27 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(opponent_queen)
 
       assert [
-        %Movement{
-          coords: ["d1", "c2", "b3", "a4"],
-          end: "a4",
-          start: "d1"
-        },
-        %Movement{
-          coords: ["d1", "e2", "f3", "g4", "h5"],
-          end: "h5",
-          start: "d1"
-        },
-        %Movement{
-          coords: ["d1", "e1", "f1", "g1", "h1"],
-          end: "h1",
-          start: "d1"
-        },
-        %Movement{
-          coords: ["d1", "d2", "d3", "d4"],
-          end: "d4",
-          start: "d1"
-        }
-      ] = Movement.get_movements(board, queen)
+               %Movement{
+                 coords: ["d1", "c2", "b3", "a4"],
+                 end: "a4",
+                 start: "d1"
+               },
+               %Movement{
+                 coords: ["d1", "e2", "f3", "g4", "h5"],
+                 end: "h5",
+                 start: "d1"
+               },
+               %Movement{
+                 coords: ["d1", "e1", "f1", "g1", "h1"],
+                 end: "h1",
+                 start: "d1"
+               },
+               %Movement{
+                 coords: ["d1", "d2", "d3", "d4"],
+                 end: "d4",
+                 start: "d1"
+               }
+             ] = Movement.get_movements(board, queen)
     end
   end
 
@@ -147,16 +151,17 @@ defmodule Chess.Game.MovementTest do
       board = Board.add_piece(board, bishop)
 
       assert [
-        %Chess.Movements.Movement{
-          coords: ["c1", "b2", "a3"],
-          end: "a3",
-          start: "c1"
-        },
-        %Chess.Movements.Movement{
-          coords: ["c1", "d2", "e3", "f4", "g5", "h6"],
-          end: "h6",
-          start: "c1"
-        }] = Movement.get_movements(board, bishop)
+               %Chess.Movements.Movement{
+                 coords: ["c1", "b2", "a3"],
+                 end: "a3",
+                 start: "c1"
+               },
+               %Chess.Movements.Movement{
+                 coords: ["c1", "d2", "e3", "f4", "g5", "h6"],
+                 end: "h6",
+                 start: "c1"
+               }
+             ] = Movement.get_movements(board, bishop)
     end
 
     test "succesfully get possible moves with another pieces" do
@@ -172,16 +177,17 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(opponent_queen)
 
       assert [
-        %Chess.Movements.Movement{
-          coords: ["c1", "b2"],
-          end: "b2",
-          start: "c1"
-        },
-        %Chess.Movements.Movement{
-          coords: ["c1", "d2", "e3", "f4", "g5", "h6"],
-          end: "h6",
-          start: "c1"
-        }] = Movement.get_movements(board, bishop)
+               %Chess.Movements.Movement{
+                 coords: ["c1", "b2"],
+                 end: "b2",
+                 start: "c1"
+               },
+               %Chess.Movements.Movement{
+                 coords: ["c1", "d2", "e3", "f4", "g5", "h6"],
+                 end: "h6",
+                 start: "c1"
+               }
+             ] = Movement.get_movements(board, bishop)
     end
   end
 
@@ -193,16 +199,17 @@ defmodule Chess.Game.MovementTest do
       board = Board.add_piece(board, rook)
 
       assert [
-        %Movement{
-          coords: ["a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"],
-          end: "h1",
-          start: "a1"
-        },
-        %Movement{
-          coords: ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"],
-          end: "a8",
-          start: "a1"
-        }] = Movement.get_movements(board, rook)
+               %Movement{
+                 coords: ["a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"],
+                 end: "h1",
+                 start: "a1"
+               },
+               %Movement{
+                 coords: ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"],
+                 end: "a8",
+                 start: "a1"
+               }
+             ] = Movement.get_movements(board, rook)
     end
 
     test "succesfully get possible moves with another pieces" do
@@ -218,16 +225,17 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(opponent_queen)
 
       assert [
-        %Chess.Movements.Movement{
-          coords: ["a1", "b1", "c1", "d1", "e1", "f1", "g1"],
-          end: "g1",
-          start: "a1"
-        },
-        %Chess.Movements.Movement{
-          coords: ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"],
-          end: "a8",
-          start: "a1"
-        }] = Movement.get_movements(board, rook)
+               %Chess.Movements.Movement{
+                 coords: ["a1", "b1", "c1", "d1", "e1", "f1", "g1"],
+                 end: "g1",
+                 start: "a1"
+               },
+               %Chess.Movements.Movement{
+                 coords: ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"],
+                 end: "a8",
+                 start: "a1"
+               }
+             ] = Movement.get_movements(board, rook)
     end
   end
 
@@ -294,8 +302,11 @@ defmodule Chess.Game.MovementTest do
 
       piece = build(:piece)
 
-      assert ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"] = Movement.column_from_position(board, piece)
-      assert ["a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"] = Movement.line_from_position(board, piece)
+      assert ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"] =
+               Movement.column_from_position(board, piece)
+
+      assert ["a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"] =
+               Movement.line_from_position(board, piece)
     end
 
     test "when position is not valid and not inside matrix" do
@@ -307,7 +318,6 @@ defmodule Chess.Game.MovementTest do
       assert {:error, :invalid_position} = Movement.line_from_position(board, piece)
 
       assert {:error, :invalid_position} = Movement.around_positions(board, piece)
-
     end
   end
 
@@ -316,14 +326,21 @@ defmodule Chess.Game.MovementTest do
       board = build(:board)
 
       piece = build(:piece, type: :bishop, start_position: "e4", current_position: "e4")
-      black_piece = build(:piece, type: :bishop, color: "black", start_position: "e4", current_position: "e4")
 
-      assert ["b1", "c2", "d3", "e4", "f5", "g6", "h7"] = Movement.diagonal_from_position(board, piece)
-      assert ["a8", "b7", "c6", "d5", "e4", "f3", "g2", "h1"] = Movement.anti_diagonal_from_position(board, piece)
+      black_piece =
+        build(:piece, type: :bishop, color: "black", start_position: "e4", current_position: "e4")
 
+      assert ["b1", "c2", "d3", "e4", "f5", "g6", "h7"] =
+               Movement.diagonal_from_position(board, piece)
 
-      assert [["e5"], ["f5"], ["f4"], ["f3"], ["e3"], ["d3"], ["d4"], ["d5"]] = Movement.around_positions(board, piece)
-      assert [["e3"], ["d3"], ["d4"], ["d5"], ["e5"], ["f5"], ["f4"], ["f3"]] = Movement.around_positions(board, black_piece)
+      assert ["a8", "b7", "c6", "d5", "e4", "f3", "g2", "h1"] =
+               Movement.anti_diagonal_from_position(board, piece)
+
+      assert [["e5"], ["f5"], ["f4"], ["f3"], ["e3"], ["d3"], ["d4"], ["d5"]] =
+               Movement.around_positions(board, piece)
+
+      assert [["e3"], ["d3"], ["d4"], ["d5"], ["e5"], ["f5"], ["f4"], ["f3"]] =
+               Movement.around_positions(board, black_piece)
     end
 
     test "when position is not valid and not inside matrix" do

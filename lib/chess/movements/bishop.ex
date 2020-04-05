@@ -39,7 +39,9 @@ defmodule Chess.Movements.Bishop do
       |> case do
         %Movement{} = movement ->
           [movement | acc]
-        _ -> acc
+
+        _ ->
+          acc
       end
     end)
     |> List.flatten()

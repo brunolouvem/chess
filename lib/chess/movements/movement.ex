@@ -15,6 +15,7 @@ defmodule Chess.Movements.Movement do
   @maximum_line_size 8
 
   def create([]), do: {:error, :not_valid_coords}
+
   def create(coords) when is_list(coords) do
     %__MODULE__{
       coords: coords,
@@ -22,6 +23,7 @@ defmodule Chess.Movements.Movement do
       end: List.last(coords)
     }
   end
+
   def create(_), do: {:error, :not_valid_coords}
 
   def maximum_line_size(), do: @maximum_line_size
@@ -46,10 +48,10 @@ defmodule Chess.Movements.Movement do
   def diagonal_from_position(%{matrix: matrix}, %{current_position: position}) do
     case validate_position(position) do
       [column, line] ->
-
         column_index = column_to_index(column) + 1
 
-        matrix.diagonals[Matrix.key(:diagonal, (line - column_index))]
+        matrix.diagonals[Matrix.key(:diagonal, line - column_index)]
+
       error ->
         error
     end
@@ -58,10 +60,10 @@ defmodule Chess.Movements.Movement do
   def anti_diagonal_from_position(%{matrix: matrix}, %{current_position: position}) do
     case validate_position(position) do
       [column, line] ->
-
         column_index = column_to_index(column) + 1
 
-        matrix.anti_diagonals[Matrix.key(:anti_diagonal, (line + column_index))]
+        matrix.anti_diagonals[Matrix.key(:anti_diagonal, line + column_index)]
+
       error ->
         error
     end
@@ -87,7 +89,10 @@ defmodule Chess.Movements.Movement do
     end
   end
 
-  def around_positions(%{positions: positions}, %{current_position: current_position, color: color}) do
+  def around_positions(%{positions: positions}, %{
+        current_position: current_position,
+        color: color
+      }) do
     case validate_position(current_position) do
       [_C, _L] = position ->
         [
