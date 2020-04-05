@@ -5,13 +5,13 @@
 ## Roadmap
 
 - [x] Board
-- [ ] Movements
+- [x] Movements
   - [x] Pawn
   - [x] Rook
   - [x] King
   - [x] Queen
   - [x] Bishop
-  - [ ] Knight
+  - [x] Knight
 - [ ] Create game
 - [ ] Pion's en passant
 - [ ] Castling
