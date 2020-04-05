@@ -1,7 +1,7 @@
 defmodule Chess.Movements.Movement do
   alias Chess.Board
   alias Chess.Matrix
-  alias Chess.Movements.{Bishop, King, Pawn, Queen, Rook}
+  alias Chess.Movements.{Bishop, King, Knight, Pawn, Queen, Rook}
   alias Chess.Piece
 
   defstruct coords: [], start: nil, end: nil
@@ -31,11 +31,12 @@ defmodule Chess.Movements.Movement do
   def get_movements(board, %Piece{type: type} = piece),
     do: movement_module(type).possibles(piece, board)
 
-  def movement_module(:bishop), do: Bishop
-  def movement_module(:pawn), do: Pawn
-  def movement_module(:rook), do: Rook
-  def movement_module(:king), do: King
-  def movement_module(:queen), do: Queen
+  defp movement_module(:bishop), do: Bishop
+  defp movement_module(:pawn), do: Pawn
+  defp movement_module(:rook), do: Rook
+  defp movement_module(:knight), do: Knight
+  defp movement_module(:king), do: King
+  defp movement_module(:queen), do: Queen
 
   def movement_coord(:pawn, position), do: position
   def movement_coord(:king, position), do: "K#{position}"
@@ -108,6 +109,51 @@ defmodule Chess.Movements.Movement do
 
       error ->
         error
+    end
+  end
+
+  defp build_position(column_index, line, positions) do
+    case index_to_column(column_index) do
+      nil ->
+        nil
+      column ->
+        position = "#{column}#{line}"
+        if position in positions, do: position, else: nil
+    end
+  end
+
+  def l_positions_from_position(%{positions: positions}, %{current_position: position}) do
+    case validate_position(position) do
+      {:error, _} = error ->
+        error
+
+      [column, line] ->
+        column_index = column_to_index(column)
+        # b1 = 2,1
+
+        up_left = build_position(column_index - 1, line + 2, positions)
+        up_right = build_position(column_index + 1, line + 2, positions)
+
+        down_left = build_position(column_index - 1, line - 2, positions)
+        down_right = build_position(column_index + 1, line - 2, positions)
+
+        left_up = build_position(column_index - 2, line + 1, positions)
+        left_down = build_position(column_index - 2, line - 1, positions)
+
+        right_up = build_position(column_index + 2, line + 1, positions)
+        right_down = build_position(column_index + 2, line - 1, positions)
+
+        [
+          up_left,
+          up_right,
+          down_left,
+          down_right,
+          left_up,
+          left_down,
+          right_up,
+          right_down
+        ]
+        |> Enum.filter(&(!is_nil(&1)))
     end
   end
 
@@ -391,10 +437,12 @@ defmodule Chess.Movements.Movement do
     end
   end
 
-  def extract_position(raw_position) do
+  def extract_position(raw_position) when is_binary(raw_position) do
     [c, l] = Regex.run(@position_regex, raw_position) |> List.delete(raw_position)
     [c, l |> String.to_integer()]
   end
+
+  def extract_position(_), do: nil
 
   def filter_line(line, break_points, include_break \\ false) do
     if include_break do
@@ -411,7 +459,7 @@ defmodule Chess.Movements.Movement do
     |> Enum.reverse()
   end
 
-  def centralize_position_in_sequence(sequence, current_position) do
+  def centralize_position_in_sequence(sequence, current_position) when is_list(sequence) do
     idx_on_seq = sequence |> Enum.find_index(&(&1 == current_position))
 
     if idx_on_seq == 0 do
@@ -429,7 +477,8 @@ defmodule Chess.Movements.Movement do
     @columns |> Enum.find_index(&(&1 == col))
   end
 
-  defp index_to_column(index) do
+  defp index_to_column(index) when index >= 0 do
     @columns |> Enum.at(index)
   end
+  defp index_to_column(_), do: nil
 end
