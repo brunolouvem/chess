@@ -14,8 +14,6 @@ defmodule Chess.Matrix do
     |> load_matrix(columns, lines)
   end
 
-  def plain(matrix), do: Enum.map(matrix.lines, fn {_, v} -> v end)
-
   defp load_matrix(matrix, columns, lines) do
     columns
     |> Enum.reduce(matrix, fn column, acc_matrix ->

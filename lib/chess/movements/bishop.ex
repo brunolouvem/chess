@@ -26,11 +26,21 @@ defmodule Chess.Movements.Bishop do
       anti_diagonal_before,
       anti_diagonal_after
     ]
-    |> Enum.map(fn move ->
+    |> Enum.reduce([], fn move, acc ->
       move
-      |> List.delete(current_position)
       |> Movement.filter_line(opponent_positions, true)
       |> Movement.filter_line(allies_positions)
+      |> case do
+        [] -> []
+        [^current_position] -> []
+        positions -> List.insert_at(positions, 0, current_position)
+      end
+      |> Movement.create()
+      |> case do
+        %Movement{} = movement ->
+          [movement | acc]
+        _ -> acc
+      end
     end)
     |> List.flatten()
   end
