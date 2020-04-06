@@ -54,26 +54,49 @@ defmodule Chess.Movements.Pawn do
           capture_positions,
           en_passant_possibilities
         ]
-        |> Enum.reduce([], fn move, acc ->
-          move
-          |> Movement.filter_line(opponent_positions, true)
-          |> Movement.filter_line(allies_positions)
-          |> case do
-            [] -> []
-            [^current_position] -> []
-            positions -> List.insert_at(positions, 0, current_position)
-          end
-          |> Movement.create()
-          |> case do
-            %Movement{} = movement ->
-              [movement | acc]
+        |> Enum.reduce([], fn
+          move, acc ->
+            move
+            |> create_movement(opponent_positions, allies_positions, current_position)
+            |> case do
+              %Movement{} = movement ->
+                [movement | acc]
 
-            _ ->
-              acc
-          end
+              _ ->
+                acc
+            end
         end)
         |> List.flatten()
     end
+  end
+
+  defp create_movement(
+         [{coords, special}],
+         opponent_positions,
+         allies_positions,
+         current_position
+       ) do
+    coords
+    |> Movement.filter_line(opponent_positions, true)
+    |> Movement.filter_line(allies_positions)
+    |> case do
+      [] -> []
+      [^current_position] -> []
+      positions -> {List.insert_at(positions, 0, current_position), special}
+    end
+    |> Movement.create()
+  end
+
+  defp create_movement(coords, opponent_positions, allies_positions, current_position) do
+    coords
+    |> Movement.filter_line(opponent_positions, true)
+    |> Movement.filter_line(allies_positions)
+    |> case do
+      [] -> []
+      [^current_position] -> []
+      positions -> List.insert_at(positions, 0, current_position)
+    end
+    |> Movement.create()
   end
 
   def capture_possibilities(position, color, occupied_positions, all_positions) do
@@ -94,9 +117,12 @@ defmodule Chess.Movements.Pawn do
     |> List.flatten()
     |> Enum.filter(&(&1 in opponent_positions))
     |> Enum.map(fn position ->
-      position
-      |> Movement.extract_position()
-      |> Movement.up(1, color, all_positions)
+      movement =
+        position
+        |> Movement.extract_position()
+        |> Movement.up(1, color, all_positions)
+
+      {movement, :en_passant}
     end)
     |> List.flatten()
   end

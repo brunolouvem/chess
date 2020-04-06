@@ -12,9 +12,9 @@
   - [x] Queen
   - [x] Bishop
   - [x] Knight
-- [ ] Create game
+- [x] Create game
 - [x] Pion's en passant
-- [ ] Castling
+- [x] Castling
 - [ ] Checkmate
 - [ ] Checking possible checkmate for next turn
 - [ ] Pawn's promotion at last line
@@ -32,6 +32,36 @@ def deps do
     {:chess, "~> 0.1.0"}
   ]
 end
+```
+
+
+## Using
+
+### Creating a new game
+
+```elixir
+Chess.new_game()
+
+%Chess.Game{
+  board: %Chess.Board{...},
+  pgn: nil
+}
+```
+Stone the game struct, all operations needs this struct
+
+### Quering movements of pieces
+
+```elixir
+game = Chess.new_game()
+
+Chess.Game.moves?(game, "a2")
+
+%Chess.Movements.Movement{
+  coords: ["a2", "a3", "a4"],
+  end: "a4",
+  special_move: false,
+  start: "a2"
+}
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
