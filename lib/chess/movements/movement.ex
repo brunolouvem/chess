@@ -116,6 +116,7 @@ defmodule Chess.Movements.Movement do
     case index_to_column(column_index) do
       nil ->
         nil
+
       column ->
         position = "#{column}#{line}"
         if position in positions, do: position, else: nil
@@ -480,5 +481,6 @@ defmodule Chess.Movements.Movement do
   defp index_to_column(index) when index >= 0 do
     @columns |> Enum.at(index)
   end
+
   defp index_to_column(_), do: nil
 end

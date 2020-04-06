@@ -195,7 +195,9 @@ defmodule Chess.Game.MovementTest do
     test "succesfully get possible moves without another pieces" do
       board = build(:board)
       knight = build(:piece, type: :knight, start_position: "b1", current_position: "b1")
-      black_knight = build(:piece, type: :knight, color: "black", start_position: "b8", current_position: "b8")
+
+      black_knight =
+        build(:piece, type: :knight, color: "black", start_position: "b8", current_position: "b8")
 
       board =
         board
@@ -203,23 +205,25 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(black_knight)
 
       assert [
-        %Movement{coords: ["b1", "d2"], end: "d2", start: "b1"},
-        %Movement{coords: ["b1", "c3"], end: "c3", start: "b1"},
-        %Movement{coords: ["b1", "a3"], end: "a3", start: "b1"}
-      ] = Movement.get_movements(board, knight)
+               %Movement{coords: ["b1", "d2"], end: "d2", start: "b1"},
+               %Movement{coords: ["b1", "c3"], end: "c3", start: "b1"},
+               %Movement{coords: ["b1", "a3"], end: "a3", start: "b1"}
+             ] = Movement.get_movements(board, knight)
 
       assert [
-        %Movement{coords: ["b8", "d7"], end: "d7", start: "b8"},
-        %Movement{coords: ["b8", "c6"], end: "c6", start: "b8"},
-        %Movement{coords: ["b8", "a6"], end: "a6", start: "b8"}
-      ] = Movement.get_movements(board, black_knight)
+               %Movement{coords: ["b8", "d7"], end: "d7", start: "b8"},
+               %Movement{coords: ["b8", "c6"], end: "c6", start: "b8"},
+               %Movement{coords: ["b8", "a6"], end: "a6", start: "b8"}
+             ] = Movement.get_movements(board, black_knight)
     end
 
     test "succesfully get possible moves with another pieces" do
       board = build(:board)
       knight = build(:piece, type: :knight, start_position: "b1", current_position: "b1")
       allie_pawn = build(:piece, type: :pawn, start_position: "a3", current_position: "a3")
-      black_knight = build(:piece, type: :knight, color: "black", start_position: "c3", current_position: "c3")
+
+      black_knight =
+        build(:piece, type: :knight, color: "black", start_position: "c3", current_position: "c3")
 
       board =
         board
@@ -228,20 +232,20 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(black_knight)
 
       assert [
-        %Movement{coords: ["b1", "d2"], end: "d2", start: "b1"},
-        %Movement{coords: ["b1", "c3"], end: "c3", start: "b1"}
-      ] = Movement.get_movements(board, knight)
+               %Movement{coords: ["b1", "d2"], end: "d2", start: "b1"},
+               %Movement{coords: ["b1", "c3"], end: "c3", start: "b1"}
+             ] = Movement.get_movements(board, knight)
 
       assert [
-        %Movement{coords: ["c3", "e2"], end: "e2", start: "c3"},
-        %Movement{coords: ["c3", "e4"], end: "e4", start: "c3"},
-        %Movement{coords: ["c3", "a2"], end: "a2", start: "c3"},
-        %Movement{coords: ["c3", "a4"], end: "a4", start: "c3"},
-        %Movement{coords: ["c3", "d1"], end: "d1", start: "c3"},
-        %Movement{coords: ["c3", "b1"], end: "b1", start: "c3"},
-        %Movement{coords: ["c3", "d5"], end: "d5", start: "c3"},
-        %Movement{coords: ["c3", "b5"], end: "b5", start: "c3"}
-      ] = Movement.get_movements(board, black_knight)
+               %Movement{coords: ["c3", "e2"], end: "e2", start: "c3"},
+               %Movement{coords: ["c3", "e4"], end: "e4", start: "c3"},
+               %Movement{coords: ["c3", "a2"], end: "a2", start: "c3"},
+               %Movement{coords: ["c3", "a4"], end: "a4", start: "c3"},
+               %Movement{coords: ["c3", "d1"], end: "d1", start: "c3"},
+               %Movement{coords: ["c3", "b1"], end: "b1", start: "c3"},
+               %Movement{coords: ["c3", "d5"], end: "d5", start: "c3"},
+               %Movement{coords: ["c3", "b5"], end: "b5", start: "c3"}
+             ] = Movement.get_movements(board, black_knight)
     end
   end
 
@@ -293,20 +297,54 @@ defmodule Chess.Game.MovementTest do
     end
   end
 
-  describe "get_movements/1" do
+  describe "get_movements/1 :paws" do
     test "succesfully get possible moves" do
       board = build(:board)
       piece = build(:piece, start_position: "e2", current_position: "e2")
 
       board = Board.add_piece(board, piece)
 
-      assert ["e4", "e3"] = Movement.get_movements(board, piece)
+      assert [%Movement{coords: ["e2", "e3", "e4"], end: "e4", start: "e2"}] =
+               Movement.get_movements(board, piece)
 
       black_piece = build(:piece, color: "black", current_position: "e5")
 
       board = Board.add_piece(board, black_piece)
 
-      assert ["e4"] = Movement.get_movements(board, black_piece)
+      assert [%Movement{coords: ["e5", "e4"], end: "e4", start: "e5"}] =
+               Movement.get_movements(board, black_piece)
+    end
+
+    test "succesfully get possible moves with en passant white" do
+      board = build(:board)
+      piece = build(:piece, start_position: "e2", current_position: "e5")
+      black_piece = build(:piece, color: "black", current_position: "d5")
+
+      board =
+        board
+        |> Board.add_piece(piece)
+        |> Board.add_piece(black_piece)
+
+      assert [
+               %Movement{coords: ["e5", "d6"], end: "d6", start: "e5"},
+               %Movement{coords: ["e5", "e6"], end: "e6", start: "e5"}
+             ] = Movement.get_movements(board, piece)
+    end
+
+    test "succesfully get possible moves with en passant black" do
+      board = build(:board)
+      piece = build(:piece, start_position: "e2", current_position: "e4")
+      black_piece = build(:piece, color: "black", current_position: "d4")
+
+      board =
+        board
+        |> Board.add_piece(piece)
+        |> Board.add_piece(black_piece)
+
+      assert [
+               %Movement{coords: ["d4", "e3"], end: "e3", start: "d4"},
+               %Movement{coords: ["d4", "d3"], end: "d3", start: "d4"}
+             ] = Movement.get_movements(board, black_piece)
     end
 
     test "not possible move more" do
@@ -385,7 +423,9 @@ defmodule Chess.Game.MovementTest do
         build(:piece, type: :bishop, color: "black", start_position: "e4", current_position: "e4")
 
       knight = build(:piece, type: :knight, start_position: "b1", current_position: "b1")
-      black_knight = build(:piece, type: :knight, color: "black", start_position: "b8", current_position: "b8")
+
+      black_knight =
+        build(:piece, type: :knight, color: "black", start_position: "b8", current_position: "b8")
 
       assert ["b1", "c2", "d3", "e4", "f5", "g6", "h7"] =
                Movement.diagonal_from_position(board, piece)
@@ -399,8 +439,8 @@ defmodule Chess.Game.MovementTest do
       assert [["e3"], ["d3"], ["d4"], ["d5"], ["e5"], ["f5"], ["f4"], ["f3"]] =
                Movement.around_positions(board, black_piece)
 
-      assert ["a3", "c3", "d2"] =  Movement.l_positions_from_position(board, knight)
-      assert ["a6", "c6", "d7"] =  Movement.l_positions_from_position(board, black_knight)
+      assert ["a3", "c3", "d2"] = Movement.l_positions_from_position(board, knight)
+      assert ["a6", "c6", "d7"] = Movement.l_positions_from_position(board, black_knight)
     end
 
     test "when position is not valid and not inside matrix" do
@@ -408,15 +448,16 @@ defmodule Chess.Game.MovementTest do
 
       piece = build(:piece, start_position: "x9", current_position: "x9")
 
-
       knight = build(:piece, type: :knight, start_position: "x1", current_position: "x1")
-      black_knight = build(:piece, type: :knight, color: "black", start_position: "x8", current_position: "x8")
+
+      black_knight =
+        build(:piece, type: :knight, color: "black", start_position: "x8", current_position: "x8")
 
       assert {:error, :invalid_position} = Movement.diagonal_from_position(board, piece)
       assert {:error, :invalid_position} = Movement.anti_diagonal_from_position(board, piece)
 
-      assert {:error, :invalid_position} =  Movement.l_positions_from_position(board, knight)
-      assert {:error, :invalid_position} =  Movement.l_positions_from_position(board, black_knight)
+      assert {:error, :invalid_position} = Movement.l_positions_from_position(board, knight)
+      assert {:error, :invalid_position} = Movement.l_positions_from_position(board, black_knight)
     end
   end
 end

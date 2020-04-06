@@ -23,6 +23,7 @@ defmodule Chess.Movements.Knight do
       |> case do
         %Movement{} = movement ->
           [movement | acc]
+
         _ ->
           acc
       end
