@@ -13,7 +13,7 @@
   - [x] Bishop
   - [x] Knight
 - [ ] Create game
-- [ ] Pion's en passant
+- [x] Pion's en passant
 - [ ] Castling
 - [ ] Checkmate
 - [ ] Checking possible checkmate for next turn
