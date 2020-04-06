@@ -4,7 +4,7 @@ defmodule Chess.Movements.Movement do
   alias Chess.Movements.{Bishop, King, Knight, Pawn, Queen, Rook}
   alias Chess.Piece
 
-  defstruct coords: [], start: nil, end: nil
+  defstruct coords: [], start: nil, end: nil, special_move: false
 
   @callback possibles(%Board{}, %Piece{}) :: List.t()
 
@@ -15,6 +15,15 @@ defmodule Chess.Movements.Movement do
   @maximum_line_size 8
 
   def create([]), do: {:error, :not_valid_coords}
+
+  def create({coords, special}) when is_list(coords) and is_atom(special) do
+    %__MODULE__{
+      coords: coords,
+      start: List.first(coords),
+      end: List.last(coords),
+      special_move: special
+    }
+  end
 
   def create(coords) when is_list(coords) do
     %__MODULE__{

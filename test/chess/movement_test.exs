@@ -17,6 +17,17 @@ defmodule Chess.Game.MovementTest do
              } = Movement.create(coords)
     end
 
+    test "when coords is valid and passed special_move field" do
+      coords = ["e1", "g1"]
+
+      assert %Movement{
+               coords: ^coords,
+               start: "e1",
+               end: "g1",
+               special_move: :castling
+             } = Movement.create({coords, :castling})
+    end
+
     test "when coords is not valid" do
       assert {:error, :not_valid_coords} = Movement.create("e4")
     end
@@ -75,8 +86,11 @@ defmodule Chess.Game.MovementTest do
       king = build(:piece, type: :king, start_position: "e1", current_position: "e1")
       allie_rook = build(:piece, type: :pawn, start_position: "h1", current_position: "h1")
 
-      black_king = build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
-      black_allie_rook = build(:piece, type: :rook, color: "black", start_position: "h8", current_position: "h8")
+      black_king =
+        build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
+
+      black_allie_rook =
+        build(:piece, type: :rook, color: "black", start_position: "h8", current_position: "h8")
 
       board =
         board
@@ -91,7 +105,7 @@ defmodule Chess.Game.MovementTest do
                %Movement{coords: ["e1", "f1"], end: "f1", start: "e1"},
                %Movement{coords: ["e1", "f2"], end: "f2", start: "e1"},
                %Movement{coords: ["e1", "e2"], end: "e2", start: "e1"},
-               %Movement{coords: ["e1", "g1"], end: "g1", start: "e1"}
+               %Movement{coords: ["e1", "g1"], end: "g1", start: "e1", special_move: :castling}
              ] = Movement.get_movements(board, king)
 
       assert [
@@ -100,7 +114,7 @@ defmodule Chess.Game.MovementTest do
                %Movement{coords: ["e8", "d8"], end: "d8", start: "e8"},
                %Movement{coords: ["e8", "d7"], end: "d7", start: "e8"},
                %Movement{coords: ["e8", "e7"], end: "e7", start: "e8"},
-               %Movement{coords: ["e8", "g8"], end: "g8", start: "e8"}
+               %Movement{coords: ["e8", "g8"], end: "g8", start: "e8", special_move: :castling}
              ] = Movement.get_movements(board, black_king)
     end
 
@@ -110,8 +124,11 @@ defmodule Chess.Game.MovementTest do
       king = build(:piece, type: :king, start_position: "e1", current_position: "e1")
       allie_rook = build(:piece, type: :pawn, start_position: "a1", current_position: "a1")
 
-      black_king = build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
-      black_allie_rook = build(:piece, type: :rook, color: "black", start_position: "a8", current_position: "a8")
+      black_king =
+        build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
+
+      black_allie_rook =
+        build(:piece, type: :rook, color: "black", start_position: "a8", current_position: "a8")
 
       board =
         board
@@ -126,7 +143,7 @@ defmodule Chess.Game.MovementTest do
                %Movement{coords: ["e1", "f1"], end: "f1", start: "e1"},
                %Movement{coords: ["e1", "f2"], end: "f2", start: "e1"},
                %Movement{coords: ["e1", "e2"], end: "e2", start: "e1"},
-               %Movement{coords: ["e1", "c1"], end: "c1", start: "e1"}
+               %Movement{coords: ["e1", "c1"], end: "c1", start: "e1", special_move: :castling}
              ] = Movement.get_movements(board, king)
 
       assert [
@@ -135,7 +152,7 @@ defmodule Chess.Game.MovementTest do
                %Movement{coords: ["e8", "d8"], end: "d8", start: "e8"},
                %Movement{coords: ["e8", "d7"], end: "d7", start: "e8"},
                %Movement{coords: ["e8", "e7"], end: "e7", start: "e8"},
-               %Movement{coords: ["e8", "c8"], end: "c8", start: "e8"}
+               %Movement{coords: ["e8", "c8"], end: "c8", start: "e8", special_move: :castling}
              ] = Movement.get_movements(board, black_king)
     end
   end
@@ -396,7 +413,7 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(black_piece)
 
       assert [
-               %Movement{coords: ["e5", "d6"], end: "d6", start: "e5"},
+               %Movement{coords: ["e5", "d6"], end: "d6", start: "e5", special_move: :en_passant},
                %Movement{coords: ["e5", "e6"], end: "e6", start: "e5"}
              ] = Movement.get_movements(board, piece)
     end
@@ -412,7 +429,7 @@ defmodule Chess.Game.MovementTest do
         |> Board.add_piece(black_piece)
 
       assert [
-               %Movement{coords: ["d4", "e3"], end: "e3", start: "d4"},
+               %Movement{coords: ["d4", "e3"], end: "e3", start: "d4", special_move: :en_passant},
                %Movement{coords: ["d4", "d3"], end: "d3", start: "d4"}
              ] = Movement.get_movements(board, black_piece)
     end

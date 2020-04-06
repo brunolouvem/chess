@@ -14,7 +14,7 @@
   - [x] Knight
 - [ ] Create game
 - [x] Pion's en passant
-- [ ] Castling
+- [x] Castling
 - [ ] Checkmate
 - [ ] Checking possible checkmate for next turn
 - [ ] Pawn's promotion at last line
