@@ -40,6 +40,8 @@ defmodule Chess.Movements.Movement do
   def get_movements(board, %Piece{type: type} = piece),
     do: movement_module(type).possibles(piece, board)
 
+  def get_movements(_, _), do: {:error, :invalid_attributes}
+
   defp movement_module(:bishop), do: Bishop
   defp movement_module(:pawn), do: Pawn
   defp movement_module(:rook), do: Rook
@@ -139,7 +141,6 @@ defmodule Chess.Movements.Movement do
 
       [column, line] ->
         column_index = column_to_index(column)
-        # b1 = 2,1
 
         up_left = build_position(column_index - 1, line + 2, positions)
         up_right = build_position(column_index + 1, line + 2, positions)
