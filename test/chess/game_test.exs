@@ -16,13 +16,13 @@ defmodule Chess.GameTest do
       game = Game.new()
 
       assert [
-        %Movement{
-          coords: ["h2", "h3", "h4"],
-          end: "h4",
-          special_move: false,
-          start: "h2"
-        }
-      ] = Game.moves?(game, "h2")
+               %Movement{
+                 coords: ["h2", "h3", "h4"],
+                 end: "h4",
+                 special_move: false,
+                 start: "h2"
+               }
+             ] = Game.moves?(game, "h2")
     end
 
     test "error when position is invalid" do

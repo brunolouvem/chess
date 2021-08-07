@@ -74,7 +74,7 @@ defmodule Chess.BoardTest do
     test "success move piece capturing another piece" do
       board = build(:board)
       piece = build(:piece)
-      black_piece = build(:piece, color: "black", current_position: "a4", start_position: "a4")
+      black_piece = build(:piece, color: :black, current_position: "a4", start_position: "a4")
 
       assert %Board{occupied_positions: ["a2"]} = board = Board.add_piece(board, piece)
 

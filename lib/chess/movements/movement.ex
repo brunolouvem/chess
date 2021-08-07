@@ -49,14 +49,6 @@ defmodule Chess.Movements.Movement do
   defp movement_module(:king), do: King
   defp movement_module(:queen), do: Queen
 
-  def movement_coord(:pawn, position), do: position
-  def movement_coord(:king, position), do: "K#{position}"
-  def movement_coord(:queen, position), do: "Q#{position}"
-  def movement_coord(:bishop, position), do: "B#{position}"
-  def movement_coord(:rook, position), do: "R#{position}"
-  def movement_coord(:knight, position), do: "N#{position}"
-  def movement_coord(_, _), do: {:error, :not_valid_piece}
-
   def diagonal_from_position(%{matrix: matrix}, %{current_position: position}) do
     case validate_position(position) do
       [column, line] ->
@@ -123,6 +115,37 @@ defmodule Chess.Movements.Movement do
     end
   end
 
+  def possible?(movement_list, position, type) when is_list(movement_list) do
+    Enum.reduce_while(movement_list, false, fn movement, acc ->
+      case possible?(movement, position, type) do
+        :inside ->
+          movement = create([movement.start, position])
+          {:halt, movement}
+
+        :exact ->
+          {:halt, movement}
+
+        _ ->
+          {:cont, acc}
+      end
+    end)
+  end
+
+  def possible?(%__MODULE__{end: end_position}, position, type)
+      when type in [:pawn, :king, :knight] and position == end_position do
+    :exact
+  end
+
+  def possible?(%__MODULE__{coords: coords}, position, _) do
+    if position in coords do
+      :inside
+    else
+      :not_found
+    end
+  end
+
+  def possible?(_, _, _), do: :not_found
+
   defp build_position(column_index, line, positions) do
     case index_to_column(column_index) do
       nil ->
@@ -168,7 +191,7 @@ defmodule Chess.Movements.Movement do
     end
   end
 
-  def up([column, line], steps, "white", all_positions) when line < 8 and is_integer(steps) do
+  def up([column, line], steps, :white, all_positions) when line < 8 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       line = line |> Kernel.+(step)
@@ -179,7 +202,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def up([column, line], steps, "black", all_positions) when line > 1 and is_integer(steps) do
+  def up([column, line], steps, :black, all_positions) when line > 1 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       line =
@@ -194,7 +217,7 @@ defmodule Chess.Movements.Movement do
 
   def up(_, _, _, _), do: []
 
-  def down([column, line], steps, "white", all_positions) when line > 1 and is_integer(steps) do
+  def down([column, line], steps, :white, all_positions) when line > 1 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       line =
@@ -207,7 +230,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def down([column, line], steps, "black", all_positions) when line < 8 and is_integer(steps) do
+  def down([column, line], steps, :black, all_positions) when line < 8 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       line =
@@ -222,7 +245,7 @@ defmodule Chess.Movements.Movement do
 
   def down(_, _, _, _), do: []
 
-  def left([column, line], steps, "white", all_positions) when column != "a" do
+  def left([column, line], steps, :white, all_positions) when column != "a" do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       column =
@@ -237,7 +260,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def left([column, line], steps, "black", all_positions) when column != "h" do
+  def left([column, line], steps, :black, all_positions) when column != "h" do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       column =
@@ -254,7 +277,7 @@ defmodule Chess.Movements.Movement do
 
   def left(_, _, _, _), do: []
 
-  def right([column, line], steps, "white", all_positions) when column != "h" do
+  def right([column, line], steps, :white, all_positions) when column != "h" do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       column =
@@ -269,7 +292,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def right([column, line], steps, "black", all_positions) when column != "a" do
+  def right([column, line], steps, :black, all_positions) when column != "a" do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
       column =
@@ -286,7 +309,7 @@ defmodule Chess.Movements.Movement do
 
   def right(_, _, _, _), do: []
 
-  def diagonal_right_up([column, line], steps, "white", all_positions)
+  def diagonal_right_up([column, line], steps, :white, all_positions)
       when column != "h" and line < 8 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -304,7 +327,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def diagonal_right_up([column, line], steps, "black", all_positions)
+  def diagonal_right_up([column, line], steps, :black, all_positions)
       when column != "a" and line > 1 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -324,7 +347,7 @@ defmodule Chess.Movements.Movement do
 
   def diagonal_right_up(_, _, _, _), do: []
 
-  def diagonal_left_up([column, line], steps, "white", all_positions)
+  def diagonal_left_up([column, line], steps, :white, all_positions)
       when column != "a" and line < 8 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -342,7 +365,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def diagonal_left_up([column, line], steps, "black", all_positions)
+  def diagonal_left_up([column, line], steps, :black, all_positions)
       when column != "h" and line > 1 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -362,7 +385,7 @@ defmodule Chess.Movements.Movement do
 
   def diagonal_left_up(_, _, _, _), do: []
 
-  def diagonal_left_down([column, line], steps, "white", all_positions)
+  def diagonal_left_down([column, line], steps, :white, all_positions)
       when column != "a" and line > 1 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -380,7 +403,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def diagonal_left_down([column, line], steps, "black", all_positions)
+  def diagonal_left_down([column, line], steps, :black, all_positions)
       when column != "h" and line < 8 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -400,7 +423,7 @@ defmodule Chess.Movements.Movement do
 
   def diagonal_left_down(_, _, _, _), do: []
 
-  def diagonal_right_down([column, line], steps, "white", all_positions)
+  def diagonal_right_down([column, line], steps, :white, all_positions)
       when column != "h" and line > 1 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -418,7 +441,7 @@ defmodule Chess.Movements.Movement do
     end)
   end
 
-  def diagonal_right_down([column, line], steps, "black", all_positions)
+  def diagonal_right_down([column, line], steps, :black, all_positions)
       when column != "a" and line < 8 and is_integer(steps) do
     1..steps
     |> Enum.reduce_while([], fn step, acc ->
@@ -437,6 +460,18 @@ defmodule Chess.Movements.Movement do
   end
 
   def diagonal_right_down(_, _, _, _), do: []
+
+  def en_passant_capture_position(end_position, color, positions) do
+    end_position
+    |> extract_position()
+    |> down(1, color, positions)
+    |> List.last()
+  end
+
+  def castling_rook_movement(:queenside_castling, :white), do: ["a1", "d1"] |> create()
+  def castling_rook_movement(:queenside_castling, :black), do: ["a8", "d8"] |> create()
+  def castling_rook_movement(:kingside_castling, :white), do: ["h1", "f1"] |> create()
+  def castling_rook_movement(:kingside_castling, :black), do: ["h8", "f8"] |> create()
 
   def validate_position(raw_position) do
     @position_regex
@@ -469,6 +504,8 @@ defmodule Chess.Movements.Movement do
     end
     |> Enum.reverse()
   end
+
+  def centralize_position_in_sequence([], _), do: []
 
   def centralize_position_in_sequence(sequence, current_position) when is_list(sequence) do
     idx_on_seq = sequence |> Enum.find_index(&(&1 == current_position))

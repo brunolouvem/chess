@@ -53,28 +53,28 @@ defmodule Chess.Movements.King do
   end
 
   defp possible_kingside_castling(
-         %Piece{color: "white", current_position: "e1", start_position: "e1"},
+         %Piece{color: :white, current_position: "e1", start_position: "e1"},
          %Board{
            occupied_positions: occupied_positions,
-           pieces: %{"h1" => %{color: "white", current_position: "h1", start_position: "h1"}}
+           pieces: %{"h1" => %{color: :white, current_position: "h1", start_position: "h1"}}
          }
        ) do
     if ["f1", "g1"] not in occupied_positions do
-      {["g1"], :castling}
+      {["g1"], :kingside_castling}
     else
       []
     end
   end
 
   defp possible_kingside_castling(
-         %Piece{color: "black", current_position: "e8", start_position: "e8"},
+         %Piece{color: :black, current_position: "e8", start_position: "e8"},
          %Board{
            occupied_positions: occupied_positions,
-           pieces: %{"h8" => %{color: "black", current_position: "h8", start_position: "h8"}}
+           pieces: %{"h8" => %{color: :black, current_position: "h8", start_position: "h8"}}
          }
        ) do
     if ["f8", "g8"] not in occupied_positions do
-      {["g8"], :castling}
+      {["g8"], :kingside_castling}
     else
       []
     end
@@ -83,28 +83,28 @@ defmodule Chess.Movements.King do
   defp possible_kingside_castling(_, _), do: []
 
   defp possible_queenside_castling(
-         %Piece{color: "white", current_position: "e1", start_position: "e1"},
+         %Piece{color: :white, current_position: "e1", start_position: "e1"},
          %Board{
            occupied_positions: occupied_positions,
-           pieces: %{"a1" => %{color: "white", current_position: "a1", start_position: "a1"}}
+           pieces: %{"a1" => %{color: :white, current_position: "a1", start_position: "a1"}}
          }
        ) do
     if ["d1", "c1"] not in occupied_positions do
-      {["c1"], :castling}
+      {["c1"], :queenside_castling}
     else
       []
     end
   end
 
   defp possible_queenside_castling(
-         %Piece{color: "black", current_position: "e8", start_position: "e8"},
+         %Piece{color: :black, current_position: "e8", start_position: "e8"},
          %Board{
            occupied_positions: occupied_positions,
-           pieces: %{"a8" => %{color: "black", current_position: "a8", start_position: "a8"}}
+           pieces: %{"a8" => %{color: :black, current_position: "a8", start_position: "a8"}}
          }
        ) do
     if ["d8", "c8"] not in occupied_positions do
-      {["c8"], :castling}
+      {["c8"], :queenside_castling}
     else
       []
     end

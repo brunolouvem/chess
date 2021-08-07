@@ -5,16 +5,16 @@ defmodule Chess.Game.PieceTest do
 
   describe "create/3" do
     test "succesfully creation" do
-      assert %Piece{current_position: "b1", start_position: "b1", color: "black", type: :pawn} =
-               Piece.create(:pawn, "black", "b1")
+      assert %Piece{current_position: "b1", start_position: "b1", color: :black, type: :pawn} =
+               Piece.create(:pawn, :black, "b1")
     end
 
     test "when position is not string" do
-      assert {:error, :invalid_fields} = Piece.create(:pawn, "black", 1)
+      assert {:error, :invalid_fields} = Piece.create(:pawn, :black, 1)
     end
 
     test "when piece type is not valid" do
-      assert {:error, :invalid_fields} = Piece.create(:rat, "black", "b1")
+      assert {:error, :invalid_fields} = Piece.create(:rat, :black, "b1")
     end
 
     test "when color is not valid" do
@@ -25,7 +25,7 @@ defmodule Chess.Game.PieceTest do
   describe "position/1" do
     test "succesfully position get" do
       position = "b1"
-      piece = Piece.create(:pawn, "black", position)
+      piece = Piece.create(:pawn, :black, position)
 
       assert position = Piece.position(piece)
     end
@@ -38,7 +38,7 @@ defmodule Chess.Game.PieceTest do
   describe "update_position/2" do
     test "succesfully position updated" do
       position = "b1"
-      piece = Piece.create(:pawn, "black", position)
+      piece = Piece.create(:pawn, :black, position)
 
       assert position = Piece.position(piece)
 

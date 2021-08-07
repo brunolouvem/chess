@@ -39,7 +39,7 @@ defmodule Chess.Game.MovementTest do
       king = build(:piece, type: :king, start_position: "e1", current_position: "e1")
 
       black_king =
-        build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
+        build(:piece, type: :king, color: :black, start_position: "e8", current_position: "e8")
 
       board = Board.add_piece(board, king)
 
@@ -64,7 +64,7 @@ defmodule Chess.Game.MovementTest do
       board = build(:board)
       king = build(:piece, type: :king, start_position: "e1", current_position: "e1")
       allie_pawn = build(:piece, type: :pawn, start_position: "d1", current_position: "d1")
-      opponent_king = build(:piece, type: :king, color: "black", current_position: "e2")
+      opponent_king = build(:piece, type: :king, color: :black, current_position: "e2")
 
       board =
         board
@@ -87,10 +87,10 @@ defmodule Chess.Game.MovementTest do
       allie_rook = build(:piece, type: :pawn, start_position: "h1", current_position: "h1")
 
       black_king =
-        build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
+        build(:piece, type: :king, color: :black, start_position: "e8", current_position: "e8")
 
       black_allie_rook =
-        build(:piece, type: :rook, color: "black", start_position: "h8", current_position: "h8")
+        build(:piece, type: :rook, color: :black, start_position: "h8", current_position: "h8")
 
       board =
         board
@@ -125,10 +125,10 @@ defmodule Chess.Game.MovementTest do
       allie_rook = build(:piece, type: :pawn, start_position: "a1", current_position: "a1")
 
       black_king =
-        build(:piece, type: :king, color: "black", start_position: "e8", current_position: "e8")
+        build(:piece, type: :king, color: :black, start_position: "e8", current_position: "e8")
 
       black_allie_rook =
-        build(:piece, type: :rook, color: "black", start_position: "a8", current_position: "a8")
+        build(:piece, type: :rook, color: :black, start_position: "a8", current_position: "a8")
 
       board =
         board
@@ -197,7 +197,7 @@ defmodule Chess.Game.MovementTest do
       board = build(:board)
       queen = build(:piece, type: :queen, start_position: "d1", current_position: "d1")
       allie_pawn = build(:piece, type: :king, start_position: "c1", current_position: "c1")
-      opponent_queen = build(:piece, type: :queen, color: "black", current_position: "d4")
+      opponent_queen = build(:piece, type: :queen, color: :black, current_position: "d4")
 
       board =
         board
@@ -255,7 +255,7 @@ defmodule Chess.Game.MovementTest do
       board = build(:board)
       bishop = build(:piece, type: :bishop, start_position: "c1", current_position: "c1")
       allie_pawn = build(:piece, type: :pawn, start_position: "a3", current_position: "a3")
-      opponent_queen = build(:piece, type: :queen, color: "black", current_position: "h6")
+      opponent_queen = build(:piece, type: :queen, color: :black, current_position: "h6")
 
       board =
         board
@@ -284,7 +284,7 @@ defmodule Chess.Game.MovementTest do
       knight = build(:piece, type: :knight, start_position: "b1", current_position: "b1")
 
       black_knight =
-        build(:piece, type: :knight, color: "black", start_position: "b8", current_position: "b8")
+        build(:piece, type: :knight, color: :black, start_position: "b8", current_position: "b8")
 
       board =
         board
@@ -310,7 +310,7 @@ defmodule Chess.Game.MovementTest do
       allie_pawn = build(:piece, type: :pawn, start_position: "a3", current_position: "a3")
 
       black_knight =
-        build(:piece, type: :knight, color: "black", start_position: "c3", current_position: "c3")
+        build(:piece, type: :knight, color: :black, start_position: "c3", current_position: "c3")
 
       board =
         board
@@ -361,7 +361,7 @@ defmodule Chess.Game.MovementTest do
       board = build(:board)
       rook = build(:piece, type: :rook, start_position: "a1", current_position: "a1")
       allie_rook = build(:piece, type: :rook, start_position: "h1", current_position: "h1")
-      opponent_queen = build(:piece, type: :queen, color: "black", current_position: "a8")
+      opponent_queen = build(:piece, type: :queen, color: :black, current_position: "a8")
 
       board =
         board
@@ -394,7 +394,7 @@ defmodule Chess.Game.MovementTest do
       assert [%Movement{coords: ["e2", "e3", "e4"], end: "e4", start: "e2"}] =
                Movement.get_movements(board, piece)
 
-      black_piece = build(:piece, color: "black", current_position: "e5")
+      black_piece = build(:piece, color: :black, current_position: "e5")
 
       board = Board.add_piece(board, black_piece)
 
@@ -405,7 +405,7 @@ defmodule Chess.Game.MovementTest do
     test "succesfully get possible moves with en passant white" do
       board = build(:board)
       piece = build(:piece, start_position: "e2", current_position: "e5")
-      black_piece = build(:piece, color: "black", current_position: "d5")
+      black_piece = build(:piece, color: :black, current_position: "d5")
 
       board =
         board
@@ -421,7 +421,7 @@ defmodule Chess.Game.MovementTest do
     test "succesfully get possible moves with en passant black" do
       board = build(:board)
       piece = build(:piece, start_position: "e2", current_position: "e4")
-      black_piece = build(:piece, color: "black", current_position: "d4")
+      black_piece = build(:piece, color: :black, current_position: "d4")
 
       board =
         board
@@ -507,12 +507,12 @@ defmodule Chess.Game.MovementTest do
       piece = build(:piece, type: :bishop, start_position: "e4", current_position: "e4")
 
       black_piece =
-        build(:piece, type: :bishop, color: "black", start_position: "e4", current_position: "e4")
+        build(:piece, type: :bishop, color: :black, start_position: "e4", current_position: "e4")
 
       knight = build(:piece, type: :knight, start_position: "b1", current_position: "b1")
 
       black_knight =
-        build(:piece, type: :knight, color: "black", start_position: "b8", current_position: "b8")
+        build(:piece, type: :knight, color: :black, start_position: "b8", current_position: "b8")
 
       assert ["b1", "c2", "d3", "e4", "f5", "g6", "h7"] =
                Movement.diagonal_from_position(board, piece)
@@ -538,7 +538,7 @@ defmodule Chess.Game.MovementTest do
       knight = build(:piece, type: :knight, start_position: "x1", current_position: "x1")
 
       black_knight =
-        build(:piece, type: :knight, color: "black", start_position: "x8", current_position: "x8")
+        build(:piece, type: :knight, color: :black, start_position: "x8", current_position: "x8")
 
       assert {:error, :invalid_position} = Movement.diagonal_from_position(board, piece)
       assert {:error, :invalid_position} = Movement.anti_diagonal_from_position(board, piece)

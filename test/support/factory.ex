@@ -7,7 +7,7 @@ defmodule Chess.Factory do
   alias Chess.Board
 
   def piece_factory do
-    Piece.create(:pawn, "white", "a2")
+    Piece.create(:pawn, :white, "a2")
   end
 
   def board_factory do

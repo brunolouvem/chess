@@ -42,22 +42,24 @@ defmodule Chess.Movements.Pawn do
         opponent_positions = Board.positions_by_color(board, opponent_color)
         allies_positions = Board.positions_by_color(board, color) |> List.delete(current_position)
 
-        walk_positions = Movement.up(position, steps, color, positions) |> Enum.reverse()
+        walk_positions =
+          1..steps
+          |> Enum.map(fn step ->
+            Movement.up(position, step, color, positions)
+            |> Enum.reverse()
+            |> Enum.filter(&(&1 not in opponent_positions))
+          end)
 
         capture_positions = capture_possibilities(position, color, opponent_positions, positions)
 
         en_passant_possibilities =
           en_passant_possibilities(position, color, opponent_positions, positions)
 
-        [
-          walk_positions,
-          capture_positions,
-          en_passant_possibilities
-        ]
+        ([capture_positions] ++ walk_positions ++ en_passant_possibilities)
         |> Enum.reduce([], fn
           move, acc ->
             move
-            |> create_movement(opponent_positions, allies_positions, current_position)
+            |> create_movement(allies_positions, current_position)
             |> case do
               %Movement{} = movement ->
                 [movement | acc]
@@ -71,13 +73,11 @@ defmodule Chess.Movements.Pawn do
   end
 
   defp create_movement(
-         [{coords, special}],
-         opponent_positions,
+         {coords, special},
          allies_positions,
          current_position
        ) do
     coords
-    |> Movement.filter_line(opponent_positions, true)
     |> Movement.filter_line(allies_positions)
     |> case do
       [] -> []
@@ -87,9 +87,8 @@ defmodule Chess.Movements.Pawn do
     |> Movement.create()
   end
 
-  defp create_movement(coords, opponent_positions, allies_positions, current_position) do
+  defp create_movement(coords, allies_positions, current_position) do
     coords
-    |> Movement.filter_line(opponent_positions, true)
     |> Movement.filter_line(allies_positions)
     |> case do
       [] -> []
@@ -104,12 +103,12 @@ defmodule Chess.Movements.Pawn do
       Movement.diagonal_left_up(position, 1, color, all_positions),
       Movement.diagonal_right_up(position, 1, color, all_positions)
     ]
-    |> Enum.filter(&(&1 in occupied_positions))
     |> List.flatten()
+    |> Enum.filter(&(&1 in occupied_positions))
   end
 
   def en_passant_possibilities([_, line] = position, color, opponent_positions, all_positions)
-      when (color == "white" and line == 5) or (color == "black" and line == 4) do
+      when (color == :white and line == 5) or (color == :black and line == 4) do
     [
       Movement.left(position, 1, color, all_positions),
       Movement.right(position, 1, color, all_positions)
